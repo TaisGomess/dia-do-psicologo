@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feliz Dia do Psicólogo 💖</title>
+<style>
+:root{
+    --bg:#fff0f5; --accent:#ff6f91; --accent-2:#ffb3c6; --card:#fff9fb;
+    --glass: rgba(255,255,255,0.6);
+    --shadow: 0 8px 24px rgba(255,111,145,0.12);
+    font-family: Inter, sans-serif;
+}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,#ffe6f0 0%,#fff7fb 100%);color:#123;}
+.wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.card{width:100%;max-width:400px;background:var(--card);border-radius:20px;padding:20px;box-shadow:var(--shadow);position:relative;overflow:hidden;display:flex;flex-direction:column;gap:15px;align-items:center;text-align:center;}
+h1{margin:0;font-size:26px;color:var(--accent);}
+.subtitle{color:#456;font-size:16px;}
+textarea{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(18,20,20,0.06);background:#fff;resize:none;min-height:80px;font-size:15px;text-align:center;}
+.photo-frame{width:100%;max-width:320px;height:320px;border-radius:18px;background:linear-gradient(180deg,var(--glass),#fff);display:flex;align-items:center;justify-content:center;overflow:hidden;border:4px solid rgba(255,111,145,0.06);}
+.photo-frame img{width:100%;height:100%;object-fit:cover;}
+.decor{position:absolute;right:-80px;top:-80px;width:250px;height:250px;background:radial-gradient(circle at 30% 20%,rgba(255,111,145,0.12),transparent 20%),radial-gradient(circle at 70% 80%,rgba(255,179,198,0.09),transparent 18%);transform:rotate(20deg);filter:blur(10px);}
+.balloon{width:50px;height:65px;border-radius:60% 60% 50% 50%;background:linear-gradient(180deg,#ffdbe8,#ff9db6);display:inline-block;margin:6px;transform-origin:center bottom;animation:float 4s ease-in-out infinite;}
+.balloon:nth-child(2){animation-duration:4.7s;background:linear-gradient(180deg,#ffcad4,#ff6f91);}
+.balloon:nth-child(3){animation-duration:3.9s;background:linear-gradient(180deg,#fff0f5,#ffb3c6);}
+@keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-18px)}100%{transform:translateY(0)}}
+canvas.confetti{position:absolute;inset:0;pointer-events:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+    <div class="card">
+    <div class="decor" aria-hidden></div>
+    <canvas class="confetti"></canvas>
+    <h1>Feliz Dia do Psicólogo 💖</h1>
+    <textarea id="noteInput" placeholder="Escreva uma mensagem carinhosa...">Voce é uma pessoa maravilhosa, orgulhosa por quem vc esta se tornando, feliz seu dia pra sempre, meu amor todinho. 💖</textarea>
+    <div class="photo-frame" id="photoFrame">
+        <img id="personImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='100%' height='100%' fill='%23fff0f5'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23ff6f91' font-size='22' font-family='Arial'>Carregue uma foto</text></svg>" alt="Foto"/>
+    </div>
+    <input id="fileInput" type="file" accept="image/*" style="margin-top:10px;">
+    <div class="balloons" aria-hidden>
+        <span class="balloon"></span>
+        <span class="balloon"></span>
+        <span class="balloon"></span>
+    </div>
+    <audio id="bgAudio" autoplay loop>
+        <source src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_b9d4f0f0b6.mp3?filename=happy-upbeat-acoustic-ambition-12227.mp3" type="audio/mpeg">
+    </audio>
+    </div>
+</div>
+
+<script>
+// Upload da foto
+const fileInput = document.getElementById('fileInput');
+const personImg = document.getElementById('personImg');
+fileInput.addEventListener('change', e => {
+    const f = e.target.files[0];
+    if(!f) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{ personImg.src = reader.result; }
+    reader.readAsDataURL(f);
+});
+
+// Corações
+document.querySelector('.card').addEventListener('click', e=>{
+    const heart = document.createElement('div');
+    heart.textContent = '💖';
+    heart.style.position='absolute';
+    heart.style.left = (e.clientX - e.currentTarget.getBoundingClientRect().left)+'px';
+    heart.style.top = (e.clientY - e.currentTarget.getBoundingClientRect().top)+'px';
+    heart.style.fontSize='22px'; heart.style.opacity='0.95';
+    heart.style.transition='transform 900ms ease-out, opacity 900ms';
+    e.currentTarget.appendChild(heart);
+    requestAnimationFrame(()=> heart.style.transform='translateY(-80px) scale(1.4)', heart.style.opacity='0');
+    setTimeout(()=>heart.remove(),900);
+});
+
+// Confete automático
+class Confetti {
+    constructor(canvas){
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.pieces = [];
+    this.colors = ['#ff6f91','#ffb3c6','#ffd6e0','#ff87a1','#ffcad4'];
+    this.running = false;
+    }
+    shoot(count = 120){
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+    for(let i=0;i<count;i++){
+        this.pieces.push({
+        x:Math.random()*w,
+        y:Math.random()*-h/2,
+        vx:(Math.random()-0.5)*6,
+        vy:Math.random()*6+2,
+        r:Math.random()*6+4,
+        color:this.colors[Math.floor(Math.random()*this.colors.length)],
+        rot:Math.random()*360,
+        vr:(Math.random()-0.5)*6
+        });
+    }
+    if(!this.running) this.run();
+    }
+    run(){
+    this.running=true;
+    const ctx=this.ctx,canvas=this.canvas,pieces=this.pieces;
+    function frame(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        for(let i=pieces.length-1;i>=0;i--){
+        const p=pieces[i];
+        p.x+=p.vx; p.y+=p.vy; p.vy+=0.12; p.rot+=p.vr;
+        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+        ctx.fillStyle=p.color; ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.6); ctx.restore();
+        if(p.y>canvas.height+50){pieces.splice(i,1);}
+        }
+        if(pieces.length>0){requestAnimationFrame(frame);} else{this.running=false;}
+    }
+    frame.call(this);
+    }
+}
+
+const conf = new Confetti(document.querySelector('canvas.confetti'));
+conf.shoot(150);
+
+function resizeCanvas(){
+    const canvas=document.querySelector('canvas.confetti');
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+</script>
+</body>
+</html>
