@@ -34,10 +34,10 @@ canvas.confetti{position:absolute;inset:0;pointer-events:none;}
     <canvas class="confetti"></canvas>
     <h1>Feliz Dia do Psicólogo 💖</h1>
     <textarea id="noteInput" placeholder="Escreva uma mensagem carinhosa...">Voce é uma pessoa maravilhosa, orgulhosa por quem vc esta se tornando, feliz seu dia pra sempre, meu amor todinho. 💖</textarea>
-    <div class="photo-frame" id="photoFrame">
-        <img id="personImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='100%' height='100%' fill='%23fff0f5'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23ff6f91' font-size='22' font-family='Arial'>Carregue uma foto</text></svg>" alt="Foto"/>
+    <div class="photo-frame" d="photoFrame">
+        <img src="fot/foto.jpg" alt="">
     </div>
-    <input id="fileInput" type="file" accept="image/*" style="margin-top:10px;">
+    <input style="margin-top:10px;">
     <div class="balloons" aria-hidden>
         <span class="balloon"></span>
         <span class="balloon"></span>
@@ -50,16 +50,6 @@ canvas.confetti{position:absolute;inset:0;pointer-events:none;}
 </div>
 
 <script>
-// Upload da foto
-const fileInput = document.getElementById('fileInput');
-const personImg = document.getElementById('personImg');
-fileInput.addEventListener('change', e => {
-    const f = e.target.files[0];
-    if(!f) return;
-    const reader = new FileReader();
-    reader.onload = ()=>{ personImg.src = reader.result; }
-    reader.readAsDataURL(f);
-});
 
 // Corações
 document.querySelector('.card').addEventListener('click', e=>{
@@ -113,7 +103,6 @@ class Confetti {
         ctx.fillStyle=p.color; ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.6); ctx.restore();
         if(p.y>canvas.height+50){pieces.splice(i,1);}
         }
-        if(pieces.length>0){requestAnimationFrame(frame);} else{this.running=false;}
     }
     frame.call(this);
     }
